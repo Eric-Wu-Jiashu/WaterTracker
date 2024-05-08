@@ -103,31 +103,32 @@ void WTMain(){
 		System_Time_Second = 0;
 	}
 
+	switch (System_State) {
 	/*
 	 * State 0 - setup state
 	 * This state ask user for body weight and convert
 	 * them to daily intake target
 	 */
-	if (System_State == 0){
-		if (Button_Select_State){
-			bodyweight += 10;
-			if (bodyweight > 300){bodyweight = 0;}
-		}
+	case 0:
+			if (Button_Select_State){
+				bodyweight += 10;
+				if (bodyweight > 300){bodyweight = 0;}
+			}
 
-		if (Button_Confirm_State){
-			System_State = 1;
-			HAL_TIM_Base_Start_IT(&htim4);
-			target = bodyweight * 35;
-		}
-		UI_Setup(bodyweight);
-	}
+			if (Button_Confirm_State){
+				System_State = 1;
+				HAL_TIM_Base_Start_IT(&htim4);
+				target = bodyweight * 35;
+			}
+			UI_Setup(bodyweight);
+			break;
 
 	/*
 	 * state 1 - info state
 	 * show user their target
 	 * get cup weight
 	 */
-	else if (System_State == 1){
+	case 1:
 		UI_Confirm();
 		System_State = 2;
 
@@ -136,15 +137,15 @@ void WTMain(){
 
 		ssd1306_UpdateScreen();
 		HAL_Delay(5000);
+		break;
 
-	}
 
 	/*
 	 * state 2 - progress state
 	 * show progress bar
 	 * detect weight change and convert to progress
 	 */
-	else if (System_State == 2){
+	case 2:
 		if (TotalWeight > Cupweight){
 			if (TotalWeight < (Prev_TotalWeight - 50)){
 				HAL_Delay(1000);
@@ -163,14 +164,21 @@ void WTMain(){
 		}
 
 		UI_Progress(progress);
-	}
+		break;
 
 	/*
 	 * state 3 - complete state
 	 * show the congratulation to user
 	 */
-	else if (System_State == 3){
+	case 3:
 		UI_Complete();
+		break;
+
+
+
+	default:
+		System_State = 2;
+			break;
 	}
 
 }
